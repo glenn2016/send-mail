@@ -1,5 +1,9 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config();
+
+// Ne charge dotenv que en local (pas en production)
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 // Création du transporteur SMTP Gmail
 const transporter = nodemailer.createTransport({

@@ -1,6 +1,10 @@
 const { transporter } = require('../config/email.config');
 const { contactEmailTemplate, confirmationEmailTemplate } = require('../templates/contact.template');
-require('dotenv').config();
+
+// Ne charge dotenv que en local
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 // Envoyer un email de contact
 const sendContactEmail = async (req, res) => {
