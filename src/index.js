@@ -1,10 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
-const multer = require('multer');
 
 const emailRoutes = require('./routes/email.routes');
-const { verifyConnection } = require('./config/email.config');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,7 +10,6 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(multer().none());
 
 // Routes
 app.use('/api', emailRoutes);
@@ -39,19 +35,12 @@ app.use((req, res) => {
 });
 
 // Démarrage du serveur
-const startServer = async () => {
-  // Vérifier la connexion SMTP
-  await verifyConnection();
-
-  app.listen(PORT, () => {
-    console.log('');
-    console.log('=================================');
-    console.log(`🚀 Serveur démarré sur le port ${PORT}`);
-    console.log(`📍 http://localhost:${PORT}`);
-    console.log(`❤️  Health: http://localhost:${PORT}/api/health`);
-    console.log('=================================');
-    console.log('');
-  });
-};
-
-startServer();
+app.listen(PORT, () => {
+  console.log('');
+  console.log('=================================');
+  console.log(`🚀 Serveur démarré sur le port ${PORT}`);
+  console.log(`📍 http://localhost:${PORT}`);
+  console.log(`❤️  Health: http://localhost:${PORT}/api/health`);
+  console.log('=================================');
+  console.log('');
+});
