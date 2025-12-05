@@ -1,32 +1,12 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Ne charge dotenv que en local (pas en production)
+// Ne charge dotenv que en local
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-// Création du transporteur SMTP Gmail
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD
-  }
-});
-
-// Vérification de la connexion au démarrage
-const verifyConnection = async () => {
-  try {
-    await transporter.verify();
-    console.log('✅ Connexion SMTP Gmail réussie');
-    return true;
-  } catch (error) {
-    console.error('❌ Erreur connexion SMTP:', error.message);
-    return false;
-  }
-};
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 module.exports = {
-  transporter,
-  verifyConnection
+  resend
 };

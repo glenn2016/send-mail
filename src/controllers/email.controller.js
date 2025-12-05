@@ -1,4 +1,4 @@
-const { transporter } = require('../config/email.config');
+const { resend } = require('../config/email.config');
 const { contactEmailTemplate, confirmationEmailTemplate } = require('../templates/contact.template');
 
 // Ne charge dotenv que en local
@@ -29,26 +29,24 @@ const sendContactEmail = async (req, res) => {
     }
 
     // 1. Email envoyé à TOI (le propriétaire du portfolio)
-    const contactMail = {
-      from: `"Portfolio Contact" <${process.env.GMAIL_USER}>`,
+    await resend.emails.send({
+      from: 'Portfolio Contact <onboarding@resend.dev>',
       to: process.env.RECIPIENT_EMAIL,
       replyTo: email,
       subject: `📬 Portfolio: ${objet || 'Nouveau message'}`,
       html: contactEmailTemplate({ nom, email, telephone, objet, message })
-    };
+    });
 
-    await transporter.sendMail(contactMail);
     console.log(`✅ Email envoyé à ${process.env.RECIPIENT_EMAIL}`);
 
     // 2. Email de confirmation envoyé à L'EXPÉDITEUR
-    const confirmationMail = {
-      from: `"Glenn Leonard MOUNGOLO" <${process.env.GMAIL_USER}>`,
+    await resend.emails.send({
+      from: 'Glenn Leonard MOUNGOLO <onboarding@resend.dev>',
       to: email,
       subject: '✅ Message bien reçu !',
       html: confirmationEmailTemplate({ nom })
-    };
+    });
 
-    await transporter.sendMail(confirmationMail);
     console.log(`✅ Confirmation envoyée à ${email}`);
 
     // Réponse succès
