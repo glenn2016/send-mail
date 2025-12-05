@@ -23,12 +23,15 @@ const sendContactEmail = async (req, res) => {
       });
     }
 
+    // 🔥 Générer un ID unique pour créer une nouvelle discussion
+    const uniqueId = Date.now().toString(36).toUpperCase();
+
     // 1. Email envoyé à TOI (le propriétaire du portfolio)
     await resend.emails.send({
       from: 'Portfolio Contact <onboarding@resend.dev>',
       to: process.env.RECIPIENT_EMAIL,
       replyTo: email,
-      subject: `📬 Portfolio: ${objet || 'Nouveau message'}`,
+      subject: `📬 Portfolio: ${objet || 'Nouveau message'} [#${uniqueId}]`,
       html: contactEmailTemplate({ nom, email, telephone, objet, message })
     });
 
