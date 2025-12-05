@@ -1,11 +1,12 @@
 const { Resend } = require('resend');
 
-// Ne charge dotenv que en local
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
+// Récupère la clé directement depuis process.env (Railway l'injecte automatiquement)
+const apiKey = process.env.RESEND_API_KEY;
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Log pour debug
+console.log('🔑 RESEND_API_KEY présente:', !!apiKey);
+
+const resend = new Resend(apiKey);
 
 module.exports = {
   resend
