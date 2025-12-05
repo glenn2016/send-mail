@@ -1,18 +1,19 @@
 # 📧 Portfolio Email API
 
-Une API REST simple et efficace pour envoyer des emails depuis un formulaire de contact de portfolio. Construite avec Node.js, Express et Nodemailer.
+Une API REST simple et efficace pour envoyer des emails depuis un formulaire de contact de portfolio. Construite avec Node.js, Express et Resend.
 
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green?style=flat-square&logo=node.js)
 ![Express](https://img.shields.io/badge/Express-5.x-blue?style=flat-square&logo=express)
+![Resend](https://img.shields.io/badge/Resend-API-purple?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
 ## ✨ Fonctionnalités
 
-- 📬 Envoi d'emails via Gmail SMTP
+- 📬 Envoi d'emails via Resend API
 - ✅ Email de confirmation automatique à l'expéditeur
 - 🎨 Templates HTML responsive et stylés
 - 🔒 Validation des données
-- 🚀 Prêt pour le déploiement (Render, Railway, Heroku, VPS...)
+- 🚀 Prêt pour le déploiement (Railway, Render, Heroku, VPS...)
 
 ## 📁 Structure du projet
 ```
@@ -20,7 +21,7 @@ portfolio-email-api/
 ├── src/
 │   ├── index.js                  # Point d'entrée
 │   ├── config/
-│   │   └── email.config.js       # Configuration SMTP
+│   │   └── email.config.js       # Configuration Resend
 │   ├── controllers/
 │   │   └── email.controller.js   # Logique d'envoi
 │   ├── routes/
@@ -28,6 +29,7 @@ portfolio-email-api/
 │   └── templates/
 │       └── contact.template.js   # Templates HTML emails
 ├── .env.example
+├── .env
 ├── .gitignore
 ├── package.json
 └── README.md
@@ -46,7 +48,13 @@ cd portfolio-email-api
 npm install
 ```
 
-### 3. Configurer les variables d'environnement
+### 3. Configurer Resend
+
+1. Crée un compte sur [resend.com](https://resend.com)
+2. Va dans **API Keys** → **Create API Key**
+3. Copie ta clé API (commence par `re_`)
+
+### 4. Configurer les variables d'environnement
 ```bash
 cp .env.example .env
 ```
@@ -54,20 +62,17 @@ cp .env.example .env
 Puis édite le fichier `.env` :
 ```env
 PORT=5000
-GMAIL_USER=ton-email@gmail.com
-GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
-RECIPIENT_EMAIL=ou-tu-recois@gmail.com
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxx
+RECIPIENT_EMAIL=ton-email@gmail.com
+NODE_ENV=development
 ```
 
-### 4. Configurer Gmail
-
-⚠️ **Important** : Tu dois créer un "Mot de passe d'application" Gmail.
-
-1. Va sur [Google Account Security](https://myaccount.google.com/security)
-2. Active la **validation en 2 étapes**
-3. Va dans **"Mots de passe des applications"**
-4. Crée un nouveau mot de passe pour "Autre" → "Portfolio API"
-5. Copie le code de 16 caractères dans ton `.env`
+| Variable | Description |
+|----------|-------------|
+| `PORT` | Port du serveur (défaut: 5000) |
+| `RESEND_API_KEY` | Ta clé API Resend |
+| `RECIPIENT_EMAIL` | Email où tu reçois les messages |
+| `NODE_ENV` | `development` ou `production` |
 
 ### 5. Lancer le serveur
 ```bash
@@ -81,8 +86,15 @@ npm start
 ## 📖 API Documentation
 
 ### Base URL
+
+**Local :**
 ```
 http://localhost:5000
+```
+
+**Production (Railway) :**
+```
+https://ton-app.up.railway.app
 ```
 
 ### Endpoints
@@ -176,7 +188,7 @@ Content-Type: application/json
 ```javascript
 const handleSubmit = async (formData) => {
   try {
-    const response = await fetch('http://localhost:5000/api/send-email', {
+    const response = await fetch('https://ton-api.up.railway.app/api/send-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -199,18 +211,25 @@ const handleSubmit = async (formData) => {
 
 ## 🚀 Déploiement
 
+### Railway (Recommandé)
+
+1. Connecte ton repo GitHub à [railway.app](https://railway.app)
+2. Crée un nouveau projet → **Deploy from GitHub repo**
+3. Ajoute les variables d'environnement :
+   - `RESEND_API_KEY`
+   - `RECIPIENT_EMAIL`
+   - `NODE_ENV` = `production`
+4. Génère un domaine dans **Settings** → **Networking** → **Generate Domain**
+
 ### Render
 
-1. Connecte ton repo GitHub à [Render](https://render.com)
-2. Crée un nouveau "Web Service"
-3. Configure les variables d'environnement
-4. Deploy !
-
-### Railway
-
-1. Connecte ton repo à [Railway](https://railway.app)
-2. Ajoute les variables d'environnement
-3. Deploy automatique !
+1. Connecte ton repo GitHub à [render.com](https://render.com)
+2. Crée un **Web Service**
+3. Configure :
+   - **Build Command** : `npm install`
+   - **Start Command** : `npm start`
+4. Ajoute les variables d'environnement
+5. Deploy !
 
 ### VPS (Ubuntu)
 ```bash
@@ -222,6 +241,10 @@ sudo apt-get install -y nodejs
 git clone https://github.com/ton-username/portfolio-email-api.git
 cd portfolio-email-api
 npm install
+
+# Configurer les variables
+cp .env.example .env
+nano .env
 
 # Utiliser PM2 pour garder le serveur actif
 npm install -g pm2
@@ -240,6 +263,18 @@ app.use(cors({
 }));
 ```
 
+## 📧 Personnaliser le domaine d'envoi (Optionnel)
+
+Par défaut, les emails sont envoyés depuis `onboarding@resend.dev`. Pour utiliser ton propre domaine :
+
+1. Va sur [resend.com/domains](https://resend.com/domains)
+2. Ajoute ton domaine
+3. Configure les DNS (SPF, DKIM)
+4. Modifie le `from` dans `email.controller.js` :
+```javascript
+from: 'contact@ton-domaine.com'
+```
+
 ## 🤝 Contribution
 
 Les contributions sont les bienvenues ! N'hésite pas à :
@@ -250,9 +285,6 @@ Les contributions sont les bienvenues ! N'hésite pas à :
 4. Push (`git push origin feature/AmazingFeature`)
 5. Ouvrir une Pull Request
 
-## 📝 License
-
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## 👤 Auteur
 
